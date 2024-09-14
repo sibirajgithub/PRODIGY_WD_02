@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="stopwatch">
+        <div class="display">
+            <span id="time">00:00:00</span>
+        </div>
+        <div class="controls">
+            <button id="startBtn">Start</button>
+            <button id="pauseBtn">Pause</button>
+            <button id="resetBtn">Reset</button>
+            <button id="lapBtn">Lap</button>
+        </div>
+        <div class="laps">
+            <h2>Laps</h2>
+            <ul id="lapList"></ul>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+    margin: 0;
+}
+
+.stopwatch {
+    text-align: center;
+}
+
+.display {
+    font-size: 3em;
+    margin-bottom: 20px;
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+button {
+    font-size: 1em;
+    margin: 0 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.laps {
+    margin-top: 20px;
+}
+
+.laps ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.laps li {
+    padding: 5px 0;
+}
+
+let startTime, updatedTime, difference, tInterval;
+let running = false;
+let lapCounter = 1;
+
+const timeDisplay = document.getElementById('time');
+const lapList = document.getElementById('lapList');
+
+document.getElementById('startBtn').addEventListener('click', startTimer);
+document.getElementById('pauseBtn').addEventListener('click', pauseTimer);
+document.getElementById('resetBtn').addEventListener('click', resetTimer);
+document.getElementById('lapBtn').addEventListener('click', recordLap);
+
+function startTimer() {
+    if (!running) {
+        startTime = new Date().getTime();
+        tInterval = setInterval(getShowTime, 1);
+        running = true;
+    }
+}
+
+function getShowTime() {
+    updatedTime = new Date().getTime();
+    difference = updatedTime - startTime;
+
+    let hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+    let minutes = Math.floor((difference / (1000 * 60)) % 60);
+    let seconds = Math.floor((difference / 1000) % 60);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    timeDisplay.innerHTML = hours + ":" + minutes + ":" + seconds;
+}
+
+function pauseTimer() {
+    clearInterval(tInterval);
+    running = false;
+}
+
+function resetTimer() {
+    clearInterval(tInterval);
+    timeDisplay.innerHTML = "00:00:00";
+    running = false;
+    lapCounter = 1;
+    lapList.innerHTML = '';
+}
+
+function recordLap() {
+    if (running) {
+        const lapTime = timeDisplay.innerHTML;
+        const lapItem = document.createElement('li');
+        lapItem.textContent = `Lap ${lapCounter}: ${lapTime}`;
+        lapList.appendChild(lapItem);
+        lapCounter++;
+    }
+}
